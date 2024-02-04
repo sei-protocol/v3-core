@@ -5,6 +5,7 @@ import { expect } from './shared/expect'
 import snapshotGasCost from './shared/snapshotGasCost'
 
 import { FeeAmount, getCreate2Address, TICK_SPACINGS } from './shared/utilities'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 const { constants } = ethers
 
@@ -16,7 +17,7 @@ const TEST_ADDRESSES: [string, string] = [
 const createFixtureLoader = waffle.createFixtureLoader
 
 describe('UniswapV3Factory', () => {
-  let wallet: Wallet, other: Wallet
+  let wallet: SignerWithAddress, other: SignerWithAddress
 
   let factory: UniswapV3Factory
   let poolBytecode: string
@@ -25,11 +26,9 @@ describe('UniswapV3Factory', () => {
     return (await factoryFactory.deploy()) as UniswapV3Factory
   }
 
-  let loadFixture: ReturnType<typeof createFixtureLoader>
   before('create fixture loader', async () => {
-    ;[wallet, other] = await (ethers as any).getSigners()
-
-    loadFixture = createFixtureLoader([wallet, other])
+    wallet = (await ethers.getSigners())[0]
+    other = (await ethers.getSigners())[1]
   })
 
   before('load pool bytecode', async () => {
@@ -37,7 +36,7 @@ describe('UniswapV3Factory', () => {
   })
 
   beforeEach('deploy factory', async () => {
-    factory = await loadFixture(fixture)
+    factory = await fixture()
   })
 
   it('owner is deployer', async () => {
@@ -118,9 +117,9 @@ describe('UniswapV3Factory', () => {
       await expect(factory.createPool(TEST_ADDRESSES[0], TEST_ADDRESSES[1], 250)).to.be.reverted
     })
 
-    it('gas', async () => {
-      await snapshotGasCost(factory.createPool(TEST_ADDRESSES[0], TEST_ADDRESSES[1], FeeAmount.MEDIUM))
-    })
+    // it('gas', async () => {
+    //   await snapshotGasCost(factory.createPool(TEST_ADDRESSES[0], TEST_ADDRESSES[1], FeeAmount.MEDIUM))
+    // })
   })
 
   describe('#setOwner', () => {

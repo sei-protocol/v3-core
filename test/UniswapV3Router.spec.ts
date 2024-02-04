@@ -57,9 +57,9 @@ describe('UniswapV3Pool', () => {
   })
 
   beforeEach('deploy first fixture', async () => {
-    ;({ token0, token1, token2, factory, createPool, swapTargetCallee, swapTargetRouter } = await loadFixture(
-      poolFixture
-    ))
+    const signers = await ethers.getSigners();
+    const wallet = signers[0];
+    ;({ token0, token1, token2, factory, createPool, swapTargetCallee, swapTargetRouter } = await poolFixture([wallet], waffle.provider))
 
     const createPoolWrapped = async (
       amount: number,

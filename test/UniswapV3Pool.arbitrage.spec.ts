@@ -24,6 +24,7 @@ import {
   SwapFunction,
   TICK_SPACINGS,
 } from './shared/utilities'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 const {
   constants: { MaxUint256 },
@@ -74,7 +75,8 @@ describe('UniswapV3Pool arbitrage tests', () => {
         expandTo18Decimals(100),
       ]) {
         describe(`passive liquidity of ${formatTokenAmount(passiveLiquidity)}`, () => {
-          const arbTestFixture = async ([wallet, arbitrageur]: Wallet[]) => {
+          // const arbTestFixture = async ([wallet, arbitrageur]: Wallet[]) => {
+          const arbTestFixture = async ([wallet, arbitrageur]: SignerWithAddress[]) => {
             const fix = await poolFixture([wallet], waffle.provider)
 
             const pool = await fix.createPool(feeAmount, tickSpacing)
@@ -124,6 +126,9 @@ describe('UniswapV3Pool arbitrage tests', () => {
           let tickMath: TickMathTest
 
           beforeEach('load the fixture', async () => {
+            const signers = await ethers.getSigners()
+            const wallet = signers[0];
+            const arbitrageur = signers[1];
             ;({
               swapExact0For1,
               pool,
@@ -133,7 +138,7 @@ describe('UniswapV3Pool arbitrage tests', () => {
               swapExact1For0,
               tester,
               tickMath,
-            } = await loadFixture(arbTestFixture))
+            } = await arbTestFixture([wallet, arbitrageur]))
           })
 
           async function simulateSwap(

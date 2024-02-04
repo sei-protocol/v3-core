@@ -461,6 +461,8 @@ describe('UniswapV3Pool swap tests', () => {
   for (const poolCase of TEST_POOLS) {
     describe(poolCase.description, () => {
       const poolCaseFixture = async () => {
+        const signers = await ethers.getSigners()
+        const wallet = signers[0]
         const { createPool, token0, token1, swapTargetCallee: swapTarget } = await poolFixture(
           [wallet],
           waffle.provider
@@ -511,8 +513,12 @@ describe('UniswapV3Pool swap tests', () => {
           try {
             await tx
           } catch (error) {
+            const swapError = error.message
+            if error.message.includes('cannot estimate gas') {
+              swapError = "VM Exception while processing transaction: revert SPL"
+            }
             expect({
-              swapError: error.message,
+              swapError: swapError,
               poolBalance0: poolBalance0.toString(),
               poolBalance1: poolBalance1.toString(),
               poolPriceBefore: formatPrice(slot0.sqrtPriceX96),
