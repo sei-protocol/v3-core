@@ -3,14 +3,14 @@ import { ethers, waffle } from 'hardhat'
 import { NoDelegateCallTest } from '../typechain/NoDelegateCallTest'
 import { expect } from './shared/expect'
 import snapshotGasCost from './shared/snapshotGasCost'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 describe('NoDelegateCall', () => {
-  let wallet: Wallet, other: Wallet
-
-  let loadFixture: ReturnType<typeof waffle.createFixtureLoader>
+  let wallet: SignerWithAddress;
   before('create fixture loader', async () => {
-    ;[wallet, other] = await (ethers as any).getSigners()
-    loadFixture = waffle.createFixtureLoader([wallet, other])
+    const signers = await ethers.getSigners()
+    wallet = signers[0]
+    const other = signers[1]
   })
 
   const noDelegateCallFixture = async () => {
@@ -29,7 +29,7 @@ describe('NoDelegateCall', () => {
   let proxy: NoDelegateCallTest
 
   beforeEach('deploy test contracts', async () => {
-    ;({ noDelegateCallTest: base, proxy } = await loadFixture(noDelegateCallFixture))
+    ;({ noDelegateCallTest: base, proxy } = await noDelegateCallFixture())
   })
 
   it('runtime overhead', async () => {
