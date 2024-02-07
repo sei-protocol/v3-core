@@ -12,6 +12,9 @@ import type {
 
 // import { Fixture } from 'ethereum-waffle'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
+import {
+  sleep,
+} from '../shared/utilities'
 
 interface FactoryFixture {
   factory: UniswapV3Factory
@@ -70,7 +73,10 @@ export const poolFixture: MyFixture<PoolFixture> = async function (): Promise<Po
   const routerContractFactory = await ethers.getContractFactory('TestUniswapV3Router')
 
   const swapTargetCallee = (await calleeContractFactory.deploy()) as TestUniswapV3Callee
+  await sleep(3000);
+
   const swapTargetRouter = (await routerContractFactory.deploy()) as TestUniswapV3Router
+  await sleep(3000);
 
   return {
     token0,
